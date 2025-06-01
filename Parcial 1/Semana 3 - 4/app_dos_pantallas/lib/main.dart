@@ -4,25 +4,59 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  ThemeMode _themeMode = ThemeMode.light;
+
+  void _toggleTheme() {
+    setState(() {
+      _themeMode =
+          _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Perfil Flutter',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme:
+            ColorScheme.fromSeed(seedColor: Colors.deepPurple, brightness: Brightness.light),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Perfil de Freddy Guaman'),
+      darkTheme: ThemeData(
+        colorScheme:
+            ColorScheme.fromSeed(seedColor: Colors.deepPurple, brightness: Brightness.dark),
+        useMaterial3: true,
+      ),
+      themeMode: _themeMode,
+      home: MyHomePage(
+        title: 'Perfil de Freddy Guaman',
+        isDarkMode: _themeMode == ThemeMode.dark,
+        toggleTheme: _toggleTheme,
+      ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
   final String title;
+  final bool isDarkMode;
+  final VoidCallback toggleTheme;
+
+  const MyHomePage({
+    super.key,
+    required this.title,
+    required this.isDarkMode,
+    required this.toggleTheme,
+  });
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -43,6 +77,17 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
         backgroundColor: Colors.deepPurple,
+        actions: [
+          // Botón para cambiar tema claro / oscuro
+          IconButton(
+            icon: Icon(
+                widget.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                color: Colors.white,
+            ),
+            onPressed: widget.toggleTheme,
+            tooltip: 'Cambiar tema',
+          ),
+        ],
       ),
       body: Center(
         child: Column(
