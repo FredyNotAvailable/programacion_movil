@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'agregar_clase_screen.dart'; // Asegúrate de tener este archivo creado
-import 'clase_detail_screen.dart'; // Para ver detalles de clase
-
+import 'agregar_clase_screen.dart';
+import 'clase_detail_screen.dart';
+import '../models/clase.dart';      // Ajusta la ruta
+import '../models/materia.dart';   // Ajusta la ruta
+import '../models/docente.dart';   // Ajusta la ruta
 
 class ClaseListScreen extends StatefulWidget {
   const ClaseListScreen({super.key});
@@ -11,24 +13,65 @@ class ClaseListScreen extends StatefulWidget {
 }
 
 class _ClaseListScreenState extends State<ClaseListScreen> {
-  // Lista que guarda las clases
-  final List<Map<String, String>> clases = [
-    {'nombre': 'Matemáticas', 'horario': 'Lunes 08:00 - 10:00'},
-    {'nombre': 'Física', 'horario': 'Miércoles 14:00 - 16:00'},
+  // Simulamos algunas materias y docentes disponibles
+  final List<Materia> materiasDisponibles = [
+    Materia(nombre: 'Matemáticas', docente: Docente(nombre: 'Luis Pérez')),
+    Materia(nombre: 'Física', docente: Docente(nombre: 'Ana Torres')),
   ];
 
-  // Esta función agrega una nueva clase
-  void _agregarClase(String nombre, String horario) {
+  // Lista que guarda las clases con sus materias asociadas
+  final List<Clase> clases = [
+    Clase(
+      nombre: 'Matemáticas Avanzadas',
+      horario: 'Lunes 08:00 - 10:00',
+      materia: Materia(nombre: 'Matemáticas', docente: Docente(nombre: 'Luis Pérez')),
+    ),
+    Clase(
+      nombre: 'Física Experimental',
+      horario: 'Miércoles 14:00 - 16:00',
+      materia: Materia(nombre: 'Física', docente: Docente(nombre: 'Ana Torres')),
+    ),
+  ];
+
+  void _agregarClase(String nombre, String horario, Materia materia) {
     setState(() {
-      clases.add({'nombre': nombre, 'horario': horario});
+      clases.add(Clase(nombre: nombre, horario: horario, materia: materia));
     });
+  }
+
+  void _eliminarClase(int index) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmar eliminación'),
+        content: const Text('¿Estás seguro de eliminar esta clase?'),
+        actions: [
+          TextButton(
+            child: const Text('Cancelar'),
+            onPressed: () => Navigator.pop(context),
+          ),
+          TextButton(
+            child: const Text('Eliminar'),
+            onPressed: () {
+              setState(() {
+                clases.removeAt(index);
+              });
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   void _abrirAgregarClase() {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AgregarClaseScreen(onAgregar: _agregarClase),
+        builder: (context) => AgregarClaseScreen(
+          materiasDisponibles: materiasDisponibles,
+          onAgregar: _agregarClase,
+        ),
       ),
     );
   }
@@ -52,21 +95,27 @@ class _ClaseListScreenState extends State<ClaseListScreen> {
           return Card(
             margin: const EdgeInsets.all(10),
             child: ListTile(
-              title: Text(clase['nombre']!),
-              subtitle: Text(clase['horario']!),
-              trailing: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ClaseDetailScreen(
-                        nombre: clase['nombre']!,
-                        horario: clase['horario']!,
-                      ),
-                    ),
-                  );
-                },
+              title: Text(clase.nombre),
+              subtitle: Text('${clase.horario} - Materia: ${clase.materia.nombre}'),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_forward_ios),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ClaseDetailScreen(clase: clase),
+                        ),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () => _eliminarClase(index),
+                  ),
+                ],
               ),
             ),
           );

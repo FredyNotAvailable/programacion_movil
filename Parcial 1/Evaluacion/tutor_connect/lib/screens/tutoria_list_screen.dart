@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/tutoria.dart';
 import 'tutoria_add_screen.dart';
+import 'tutoria_detail_screen.dart'; // Importa la pantalla detalle
 
 class TutoriaListScreen extends StatefulWidget {
   const TutoriaListScreen({super.key});
@@ -16,6 +17,31 @@ class _TutoriaListScreenState extends State<TutoriaListScreen> {
     setState(() {
       tutorias.add(tutoria);
     });
+  }
+
+  void _eliminarTutoria(int index) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmar eliminación'),
+        content: const Text('¿Estás seguro de eliminar esta tutoría?'),
+        actions: [
+          TextButton(
+            child: const Text('Cancelar'),
+            onPressed: () => Navigator.pop(context),
+          ),
+          TextButton(
+            child: const Text('Eliminar'),
+            onPressed: () {
+              setState(() {
+                tutorias.removeAt(index);
+              });
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   void _abrirAgregarTutoria() {
@@ -46,12 +72,34 @@ class _TutoriaListScreenState extends State<TutoriaListScreen> {
               itemBuilder: (context, index) {
                 final tutoria = tutorias[index];
                 return ListTile(
-                  title: Text(tutoria.materia),
-                  subtitle: Text('Docente: ${tutoria.docente}\nFecha: ${tutoria.fecha.toLocal()}'.split(' ')[0]),
+                  title: Text(tutoria.materia.nombre),
+                  subtitle: Text(
+                    'Docente: ${tutoria.docente.nombre}',
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.info, color: Colors.blue),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TutoriaDetailScreen(tutoria: tutoria),
+                            ),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () => _eliminarTutoria(index),
+                      ),
+                    ],
+                  ),
                 );
+
               },
             ),
     );
   }
 }
-  
