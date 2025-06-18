@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 void main() => runApp(RecetasApp());
 
 class RecetasApp extends StatelessWidget {
+  const RecetasApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -14,6 +16,8 @@ class RecetasApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -92,6 +96,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
 // Pantalla Perfil (secundaria)
 class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,6 +113,8 @@ class ProfileScreen extends StatelessWidget {
 
 // Pantalla Ayuda (secundaria)
 class HelpScreen extends StatelessWidget {
+  const HelpScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

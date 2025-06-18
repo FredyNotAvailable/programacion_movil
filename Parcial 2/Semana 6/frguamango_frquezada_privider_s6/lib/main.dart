@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 void main() => runApp(MyDrawerApp());
 
 class MyDrawerApp extends StatelessWidget {
+  const MyDrawerApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

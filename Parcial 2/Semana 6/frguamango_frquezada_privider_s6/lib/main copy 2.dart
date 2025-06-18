@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 void main() => runApp(MyTabsApp());
 
 class MyTabsApp extends StatelessWidget {
+  const MyTabsApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

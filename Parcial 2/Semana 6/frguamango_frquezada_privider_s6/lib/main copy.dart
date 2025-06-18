@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 void main() => runApp(MyBottomNavApp());
 
 class MyBottomNavApp extends StatefulWidget {
+  const MyBottomNavApp({super.key});
+
   @override
   _MyBottomNavAppState createState() => _MyBottomNavAppState();
 }
