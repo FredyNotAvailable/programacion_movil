@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "200640869247",
+    "project_id": "tutorconnect-333e4",
+    "storage_bucket": "tutorconnect-333e4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:200640869247:android:5d0b7a6d8ec3edb0d2204a",
+        "android_client_info": {
+          "package_name": "com.example.tutor_connect"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOGKRPJPNmuHCS_IDMAbHQ7zzze3HzMYQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

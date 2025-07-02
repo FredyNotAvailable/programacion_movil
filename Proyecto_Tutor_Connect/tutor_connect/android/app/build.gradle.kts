@@ -1,14 +1,14 @@
 plugins {
-    id("com.android.application")
-    id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
-    id("dev.flutter.flutter-gradle-plugin")
+    id("com.android.application")                  // ✔️ Necesario
+    id("kotlin-android")                           // ✔️ Necesario si usas código Kotlin
+    id("dev.flutter.flutter-gradle-plugin")        // ✔️ Obligatorio para Flutter
+    id("com.google.gms.google-services")           // ✔️ Firebase
 }
 
 android {
     namespace = "com.example.tutor_connect"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973" // ✔️ Recomendado por Firebase
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -20,11 +20,8 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.tutor_connect"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        applicationId = "com.example.tutor_connect" // ✔️ Package correcto
+        minSdk = flutter.minSdkVersion              // Asegúrate que sea ≥ 21
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -32,8 +29,6 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }
     }
@@ -42,3 +37,6 @@ android {
 flutter {
     source = "../.."
 }
+
+// 👇 AÑADIDO: Asegura que el plugin de Google Services se aplique correctamente
+apply(plugin = "com.google.gms.google-services")
