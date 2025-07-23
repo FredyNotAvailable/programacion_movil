@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';  // <-- Importa Firestore
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -8,8 +9,11 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _nombreController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  String? _rolSeleccionado;
   bool _isRegistering = false;
   bool _showPassword = false;
   String? _errorMessage;
@@ -17,15 +21,34 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _signInOrRegister() async {
     try {
       if (_isRegistering) {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        if (_rolSeleccionado == null || _nombreController.text.trim().isEmpty) {
+          setState(() {
+            _errorMessage = 'Por favor completa nombre y rol';
+          });
+          return;
+        }
+
+        // Crear usuario en Firebase Auth
+        final userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
-        // Auto-login tras registro
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
+
+        // Guardar datos extendidos en Firestore
+        final uid = userCredential.user!.uid;
+        final userData = {
+          'id': uid,
+          'nombre': _nombreController.text.trim(),
+          'correo': _emailController.text.trim(),
+          'rol': _rolSeleccionado,
+          'createdAt': FieldValue.serverTimestamp(),
+        };
+
+        await FirebaseFirestore.instance.collection('usuarios').doc(uid).set(userData);
+
+        // No necesitas hacer signInWithEmailAndPassword porque ya queda autenticado automáticamente
+
       } else {
         await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
@@ -47,7 +70,12 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final isEmailValid = _isValidEmail(_emailController.text.trim());
     final isPasswordNotEmpty = _passwordController.text.isNotEmpty;
-    final isButtonEnabled = isEmailValid && isPasswordNotEmpty;
+    final isNombreNotEmpty = _nombreController.text.trim().isNotEmpty;
+    final isRolSelected = _rolSeleccionado != null;
+
+    final isButtonEnabled = _isRegistering
+        ? isEmailValid && isPasswordNotEmpty && isNombreNotEmpty && isRolSelected
+        : isEmailValid && isPasswordNotEmpty;
 
     return Scaffold(
       appBar: AppBar(title: Text(_isRegistering ? 'Registrar' : 'Iniciar sesión')),
@@ -55,6 +83,23 @@ class _LoginScreenState extends State<LoginScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            if (_isRegistering)
+              TextField(
+                controller: _nombreController,
+                decoration: const InputDecoration(labelText: 'Nombre completo'),
+                onChanged: (_) => setState(() {}),
+              ),
+            if (_isRegistering)
+              DropdownButtonFormField<String>(
+                value: _rolSeleccionado,
+                decoration: const InputDecoration(labelText: 'Selecciona rol'),
+                items: const [
+                  DropdownMenuItem(value: 'docente', child: Text('Docente')),
+                  DropdownMenuItem(value: 'estudiante', child: Text('Estudiante')),
+                ],
+                onChanged: (val) => setState(() => _rolSeleccionado = val),
+              ),
+            if (_isRegistering) const SizedBox(height: 12),
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(labelText: 'Email'),
@@ -86,6 +131,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 setState(() {
                   _isRegistering = !_isRegistering;
                   _errorMessage = null;
+                  // Limpiar campos cuando cambias modo
+                  _nombreController.clear();
+                  _rolSeleccionado = null;
                 });
               },
               child: Text(_isRegistering
